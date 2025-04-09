@@ -73,11 +73,7 @@ const ChildForm2 = withForm({
 
 export default function TanStackSplitSample() {
   const form = useAppForm({
-    defaultValues: {
-      firstName: 'John',
-      lastName: 'Doe',
-      bloodType: 'A',
-    },
+    ...formOpts,
     onSubmit: async ({ value }) => {
       console.log("onSubmit", { value })
       await new Promise((resolve) => setTimeout(resolve, 1000))
