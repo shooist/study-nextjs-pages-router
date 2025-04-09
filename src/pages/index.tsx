@@ -1,4 +1,4 @@
-import TanStackSample from "@/components/TanStackSample";
+import TanStackSplitSample from "@/components/TanStackSplitSample";
 import localFont from "next/font/local";
 
 const geistSans = localFont({
@@ -19,7 +19,8 @@ export default function Home() {
     >
       <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
         <div className="">hoge</div>
-        <TanStackSample />
+        {/* <TanStackSample /> */}
+        <TanStackSplitSample />
       </main>
     </div>
   );
