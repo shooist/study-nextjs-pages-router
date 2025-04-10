@@ -18,3 +18,20 @@ export const peopleFormOpts = formOptions({
     },
   },
 })
+
+export const initialValues = {
+  fullName: 'hoge',
+  email: 'foo',
+  phone: 'baz',
+  address: {
+    line1: '',
+    line2: '',
+    city: '',
+    state: '',
+    zip: '',
+  },
+  emergencyContact: {
+    fullName: '',
+    phone: '',
+  },
+}

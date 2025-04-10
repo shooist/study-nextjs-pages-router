@@ -1,11 +1,11 @@
 
 import { useAppForm } from '@/libs/tanStackForm/form'
 import { AddressFields } from './address-fields'
-import { peopleFormOpts } from './shared-form'
+import { initialValues } from './shared-form'
 
 export const PeoplePage = () => {
   const form = useAppForm({
-    ...peopleFormOpts,
+    defaultValues: initialValues,
     // validators: {
     //   onChange: ({ value }) => {
     //     const errors = {
