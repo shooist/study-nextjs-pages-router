@@ -1,11 +1,18 @@
 import { withForm } from '@/libs/tanStackForm/form'
 import { peopleFormOpts } from './shared-form'
 
+type AddressFieldsProps = {
+  title: string
+}
+// interface AddressFieldsForm {
+//   title: string
+// }
+
 export const AddressFields = withForm({
   ...peopleFormOpts,
   props: {
     title: 'a',
-  },
+  } as AddressFieldsProps,
   render: ({ form, title }) => {
     console.log("title", title);
     
