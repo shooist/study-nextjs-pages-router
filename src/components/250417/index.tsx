@@ -23,6 +23,13 @@ const { fieldContext, useFieldContext, formContext, useFormContext } =
 type FormData = {
   firstName: string;
   lastName: string;
+  hobbies: Hobby[];
+};
+
+type Hobby = {
+  name: string;
+  description: string;
+  id: number;
 };
 
 // const formSchema = v.object({
@@ -168,6 +175,10 @@ const App250417 = () => {
     defaultValues: {
       firstName: "John",
       lastName: "Doe",
+      hobbies: [
+        { name: "Reading", description: "Books", id: 1 },
+        { name: "Traveling", description: "Travel", id: 2 },
+      ]
     },
   });
   // const form2 = useAppForm({
@@ -189,6 +200,28 @@ const App250417 = () => {
         </form.AwesomeFormWrapper>
       </form.AppForm>
       <ChildForm1 form={form} />
+
+      <form.AppField name='hobbies' mode='array'>
+        {hobbiesField => (
+          <div>
+            <h2>Hobbies</h2>
+            <div className="">
+              {hobbiesField.state.value.map((_, i) => (
+                <div key={i}>
+                  <h3>Hobby {i + 1}</h3>
+                  <form.AppField name={`hobbies[${i}].name`}>
+                    {(f) => <f.TextField label="Hobby Name" />}
+                  </form.AppField>
+                  <form.AppField name={`hobbies[${i}].description`}>
+                    {(f) => <f.TextField label="Hobby description" />}
+                  </form.AppField>
+                </div>
+              ))}
+            </div>
+          </div>
+        )
+        }
+      </form.AppField>
 
       {/* <form2.AppForm>
         <form2.AwesomeFormWrapper title="Form 2">
