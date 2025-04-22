@@ -1,7 +1,8 @@
-import { PeoplePage } from "@/components/People/People";
+import App250417 from "@/components/250417";
+// import { PeoplePage } from "@/components/People/People";
 // import TanStackSplitSample from "@/components/TanStackSplitSample";
 import localFont from "next/font/local";
-import { Suspense } from "react";
+// import { Suspense } from "react";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -23,9 +24,10 @@ export default function Home() {
         <div className="">hoge</div>
         {/* <TanStackSample /> */}
         {/* <TanStackSplitSample /> */}
-        <Suspense fallback={<p>Loading...</p>}>
+        {/* <Suspense fallback={<p>Loading...</p>}>
           <PeoplePage />
-        </Suspense>
+        </Suspense> */}
+        <App250417 />
       </main>
     </div>
   );
