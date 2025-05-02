@@ -15,26 +15,33 @@ import {
   ReactFormExtendedApi,
 } from "@tanstack/react-form";
 import { ComponentType, PropsWithChildren } from "react";
-// import * as v from "valibot";
+import * as v from "valibot";
 
 const { fieldContext, useFieldContext, formContext, useFormContext } =
   createFormHookContexts();
 
-type FormData = {
-  firstName: string;
-  lastName: string;
-  hobbies: Hobby[];
-};
+// type FormData = {
+//   firstName: string;
+//   lastName: string;
+//   hobbies: Hobby[];
+// };
 
-type Hobby = {
-  name: string;
-  description: string;
-  id: number;
-};
+// type Hobby = {
+//   name: string;
+//   description: string;
+//   id: number;
+// };
+
+// const hobbySchema = v.object({
+//   name: v.string(),
+//   description: v.string(),
+//   id: v.number(),
+// });
 
 // const formSchema = v.object({
-//   firstName: v.string(),
+//   firstName: v.pipe(v.string(), v.nonEmpty("firstNameは必須です")),
 //   lastName: v.string(),
+//   hobbies: v.array(hobbySchema),
 // });
 
 const fieldComponents = {
@@ -132,6 +139,12 @@ export type AppFormType<TFormData> = AppFieldExtendedReactFormApi<
 
 function TextField({ label }: { label: string }) {
   const field = useFieldContext<string>();
+  const meta = field.getMeta();
+  console.log('meta', label, meta);
+  // console.log('field', label, field.state.meta);
+  
+
+  
   return (
     <label>
       <div>{label}</div>
@@ -139,6 +152,9 @@ function TextField({ label }: { label: string }) {
         value={field.state.value}
         onChange={(e) => field.handleChange(e.target.value)}
       />
+      <div className="">errors: {field.state.meta.errors ? (
+        <em role="alert">{field.state.meta.errors.map((error, i) => (<div className="text-red-500 font-bold" key={i}>{error.message}</div>))}</em>
+      ) : null}</div>
     </label>
   );
 }
@@ -148,16 +164,25 @@ function AwesomeFormWrapper({
   children,
 }: React.PropsWithChildren<{ title: string }>) {
   const form = useFormContext();
-  const handleClick = () => {
-    console.log('form values : ', form.state.values);
-  };
+  // const handleClick = () => {
+  //   console.log("form values : ", form.state.values);
+  //   const result = v.safeParse(formSchema, form.state.values);
+  //   if(!result.success) {
+  //     console.log("validation errors:", result);
+  //     return;
+  //   }
+  // };
 
   return (
     <div>
       <p>{title}</p>
       {children}
       <form.Subscribe selector={(state) => state.isSubmitting}>
-        {(isSubmitting) => <button disabled={isSubmitting} onClick={handleClick}>submit</button>}
+        {(isSubmitting) => (
+          <button disabled={isSubmitting} >
+            submit
+          </button>
+        )}
       </form.Subscribe>
     </div>
   );
@@ -170,15 +195,30 @@ const { useAppForm } = createFormHook({
   formComponents,
 });
 
+const TextFieldSchema = v.pipe(v.string(), v.nonEmpty('テキストにゅうりょくしてね'))
+
 const App250417 = () => {
   const form = useAppForm({
     defaultValues: {
-      firstName: "John",
+      firstName: "",
       lastName: "Doe",
       hobbies: [
         { name: "Reading", description: "Books", id: 1 },
         { name: "Traveling", description: "Travel", id: 2 },
-      ]
+      ],
+    },
+    // validators: {
+    //   onSubmit: formSchema,
+    //   onChange: formSchema,
+    //   onBlur: formSchema,
+    // },
+    onSubmit: ({ value }) => {
+      console.log("Form submitted with values: ", value);
+      // const result = v.safeParse(formSchema, value);
+      // if (!result.success) {
+        // console.log("validation errors:", result);
+        // return;
+      // }
     },
   });
   // const form2 = useAppForm({
@@ -191,7 +231,10 @@ const App250417 = () => {
     <>
       <form.AppForm>
         <form.AwesomeFormWrapper title="Form 1">
-          <form.AppField name="firstName">
+          <form.AppField name="firstName" validators={{
+            onSubmit: TextFieldSchema,
+            // onChange: TextFieldSchema,
+          }}>
             {(f) => <f.TextField label="First Name" />}
           </form.AppField>
           <form.AppField name="lastName">
@@ -199,10 +242,10 @@ const App250417 = () => {
           </form.AppField>
         </form.AwesomeFormWrapper>
       </form.AppForm>
-      <ChildForm1 form={form} />
+      {/* <ChildForm1 form={form} /> */}
 
-      <form.AppField name='hobbies' mode='array'>
-        {hobbiesField => (
+      {/* <form.AppField name="hobbies" mode="array">
+        {(hobbiesField) => (
           <div>
             <h2>Hobbies</h2>
             <div className="">
@@ -219,9 +262,8 @@ const App250417 = () => {
               ))}
             </div>
           </div>
-        )
-        }
-      </form.AppField>
+        )}
+      </form.AppField> */}
 
       {/* <form2.AppForm>
         <form2.AwesomeFormWrapper title="Form 2">
@@ -234,18 +276,18 @@ const App250417 = () => {
   );
 };
 
-const ChildForm1 = ({ form }: { form: AppFormType<FormData> }) => {
-  return (
-    <form.AppForm>
-      <form.AwesomeFormWrapper title="Form 1">
-        <form.AppField name='firstName'>
-          {(f) => <f.TextField label="First Name" />}
-        </form.AppField>
-        <form.AppField name="lastName">
-          {(f) => <f.TextField label="Last Name" />}
-        </form.AppField>
-      </form.AwesomeFormWrapper>
-    </form.AppForm>
-  );
-};
+// const ChildForm1 = ({ form }: { form: AppFormType<FormData> }) => {
+//   return (
+//     <form.AppForm>
+//       <form.AwesomeFormWrapper title="Form 1">
+//         <form.AppField name="firstName">
+//           {(f) => <f.TextField label="First Name" />}
+//         </form.AppField>
+//         <form.AppField name="lastName">
+//           {(f) => <f.TextField label="Last Name" />}
+//         </form.AppField>
+//       </form.AwesomeFormWrapper>
+//     </form.AppForm>
+//   );
+// };
 export default App250417;
