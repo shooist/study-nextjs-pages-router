@@ -1,6 +1,7 @@
 import App250417 from "@/components/250417";
 import TanStackSample from "@/components/TanStackSample";
 import TanStackSampleValibot from "@/components/TanStackSampleValibot";
+import TanStackSampleValibotArray from "@/components/TanStackSampleValibotArray";
 // import { PeoplePage } from "@/components/People/People";
 // import TanStackSplitSample from "@/components/TanStackSplitSample";
 import localFont from "next/font/local";
@@ -25,7 +26,8 @@ export default function Home() {
       <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
         <div className="">hoge</div>
         {/* <TanStackSample /> */}
-        <TanStackSampleValibot />
+        {/* <TanStackSampleValibot /> */}
+        <TanStackSampleValibotArray />
         {/* <TanStackSplitSample /> */}
         {/* <Suspense fallback={<p>Loading...</p>}>
           <PeoplePage />
