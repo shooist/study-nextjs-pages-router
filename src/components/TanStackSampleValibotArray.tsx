@@ -2,6 +2,7 @@ import { ComponentType, PropsWithChildren, useEffect, useState } from "react";
 import { createFormHookContexts, useStore } from "@tanstack/react-form";
 import type {
   AnyFieldApi,
+  DeepKeys,
   FieldComponent,
   FormAsyncValidateOrFn,
   FormValidateOrFn,
@@ -250,10 +251,10 @@ interface ValidationError {
   requirement?: number;
 }
 
-function useArrayFirstError<TFormValues>(
-  form: AppFormType<TFormValues>,
-  arrayFieldName: string
-) {
+function useArrayFirstError<
+  TFormValues,
+  TFieldName extends DeepKeys<TFormValues>
+>(form: AppFormType<TFormValues>, arrayFieldName: TFieldName) {
   console.log("useArrayFirstError", arrayFieldName);
 
   const [firstError, setFirstError] = useState<string | null>(null);
