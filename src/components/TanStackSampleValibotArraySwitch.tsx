@@ -1,5 +1,4 @@
-import { ComponentType, PropsWithChildren, useEffect, useState } from "react";
-import { createFormHookContexts, useStore } from "@tanstack/react-form";
+import { ComponentType, useState } from "react";
 import type {
   AnyFieldApi,
   DeepKeys,
@@ -8,11 +7,7 @@ import type {
   FormValidateOrFn,
   ReactFormExtendedApi,
 } from "@tanstack/react-form";
-import * as v from "valibot";
 import { useAppForm } from "@/libs/tanStackForm/form";
-
-const { fieldContext, useFieldContext, formContext, useFormContext } =
-  createFormHookContexts();
 
 const fieldComponents = {};
 
@@ -78,21 +73,7 @@ export type AppFormType<TFormData> = AppFieldExtendedReactFormApi<
   typeof formComponents
 >;
 
-const FirstNameSchema = v.pipe(
-  v.string(),
-  v.nonEmpty("First name is required"),
-  v.minLength(3, "First name must be at least 3 characters")
-);
-
-const HobbySchema = v.pipe(
-  v.string(),
-  v.nonEmpty("Hobby name is required"),
-  v.minLength(3, "Hobby name must be at least 3 characters")
-);
-
 function FieldInfo({ field, label }: { field: AnyFieldApi; label?: string }) {
-  const fieldErrors = field.state.meta.errors;
-  console.log("fieldErrors", label, fieldErrors);
   return (
     <>
       {field.state.meta.isTouched && field.state.meta.errors.length
@@ -105,6 +86,12 @@ function FieldInfo({ field, label }: { field: AnyFieldApi; label?: string }) {
       {field.state.meta.isValidating ? "Validating..." : null}
     </>
   );
+}
+
+type FormData = {
+  firstName: string;
+  lastName: string;
+  hobbies: string[];
 }
 
 export default function TanStackSampleValibotArraySwitch() {
@@ -120,13 +107,25 @@ export default function TanStackSampleValibotArraySwitch() {
     },
   });
 
-  const firstError = useArrayFirstError(form, "hobbies");
-  console.log("firstError", firstError);
+  const [switchFieldName, setSwitchFieldName] = useState<DeepKeys<FormData>>("hobbies[0]");
+  console.log("switchFieldName", switchFieldName);
+  
+
+  const handleClickIndex0 = () => {
+    setSwitchFieldName("hobbies[0]");
+  }
+  const handleClickIndex1 = () => {
+    setSwitchFieldName("hobbies[1]");
+  }
+
 
   return (
     <div>
-      <h1>Simple Form Example</h1>
-      <div className="">firstError : {firstError}</div>
+      <h1>Array Switch Form Example</h1>
+      <div className="flex gap-4">
+        <button onClick={handleClickIndex0}>switch index0</button>
+        <button onClick={handleClickIndex1}>switch index1</button>
+      </div>
       <form
         onSubmit={(e) => {
           e.preventDefault();
@@ -135,16 +134,11 @@ export default function TanStackSampleValibotArraySwitch() {
         }}
       >
         <div>
-          {/* A type-safe field component*/}
-          <form.Field
-            name="firstName"
-            validators={{
-              onSubmit: FirstNameSchema,
-            }}
-          >
-            {(field) => (
+          <form.Field key={switchFieldName} name={switchFieldName}>
+            {(field) =>  {
+              return (
               <>
-                <label htmlFor={field.name}>First Name:</label>
+                <label htmlFor={field.name}>{field.name}</label>
                 <input
                   id={field.name}
                   name={field.name}
@@ -154,33 +148,13 @@ export default function TanStackSampleValibotArraySwitch() {
                 />
                 <FieldInfo field={field} />
               </>
-            )}
+            )}}
           </form.Field>
         </div>
-        <div>
-          <form.Field name="lastName">
-            {(field) => (
-              <>
-                <label htmlFor={field.name}>Last Name:</label>
-                <input
-                  id={field.name}
-                  name={field.name}
-                  value={field.state.value}
-                  onBlur={field.handleBlur}
-                  onChange={(e) => field.handleChange(e.target.value)}
-                />
-                <FieldInfo field={field} />
-              </>
-            )}
-          </form.Field>
-        </div>
-        <div className="">
+        {/* <div className="">
           <form.Field
             name="hobbies"
             mode="array"
-            // validators={{
-            //   onSubmit: HobbiesSchema,
-            // }}
           >
             {(arrayField) => (
               <div>
@@ -212,11 +186,10 @@ export default function TanStackSampleValibotArraySwitch() {
                     </div>
                   ))}
                 </div>
-                {/* <FieldInfo field={arrayField} label="hobbies" /> */}
               </div>
             )}
           </form.Field>
-        </div>
+        </div> */}
         <form.Subscribe
           selector={(state) => [state.canSubmit, state.isSubmitting]}
         >
@@ -229,72 +202,4 @@ export default function TanStackSampleValibotArraySwitch() {
       </form>
     </div>
   );
-}
-
-interface FieldMetaType {
-  isValidating: boolean;
-  isTouched: boolean;
-  isBlurred: boolean;
-  isDirty: boolean;
-  isPristine: boolean;
-  errors: ValidationError[];
-  errorMap: Record<string, ValidationError[]>;
-}
-
-interface ValidationError {
-  kind: string;
-  type: string;
-  input: string;
-  expected: string;
-  received: string;
-  message: string;
-  requirement?: number;
-}
-
-function useArrayFirstError<
-  TFormValues,
-  TFieldName extends DeepKeys<TFormValues>
->(form: AppFormType<TFormValues>, arrayFieldName: TFieldName) {
-  console.log("useArrayFirstError", arrayFieldName);
-
-  const [firstError, setFirstError] = useState<string | null>(null);
-
-  // useStoreを使用してフォームの状態を監視
-  const fieldMeta = useStore(
-    form.store,
-    (state) => state.fieldMeta as Record<string, FieldMetaType>
-  );
-  console.log("fieldMeta", fieldMeta);
-
-  useEffect(() => {
-    // fieldMetaが変更されたときに実行
-    if (fieldMeta) {
-      // 配列フィールドの子要素を検索
-      const arrayFieldEntries = Object.entries(fieldMeta).filter(
-        ([key]) => key.startsWith(`${arrayFieldName}[`) && key.endsWith("]")
-      );
-
-      // 各フィールドのエラーを確認
-      for (const [key, meta] of arrayFieldEntries) {
-        // errorsプロパティが配列で、要素があるか確認
-        if (
-          meta.errors &&
-          Array.isArray(meta.errors) &&
-          meta.errors.length > 0
-        ) {
-          // 最初のエラーオブジェクトからメッセージを取得
-          const firstErrorObj = meta.errors[0] as ValidationError;
-          if (firstErrorObj && firstErrorObj.message) {
-            setFirstError(firstErrorObj.message);
-            return; // 最初のエラーが見つかったら終了
-          }
-        }
-      }
-
-      // エラーが見つからなかった場合はnullに設定
-      setFirstError(null);
-    }
-  }, [fieldMeta, arrayFieldName]);
-
-  return firstError;
 }
