@@ -2,6 +2,10 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## 言語設定
+
+**必ず日本語で回答してください。** すべての応答は日本語で行い、コメントや説明も日本語で記述してください。
+
 ## Project Overview
 
 This is a Next.js study project using the **Pages Router** architecture (not App Router), focused on advanced form handling patterns with TanStack Form and Valibot validation.
